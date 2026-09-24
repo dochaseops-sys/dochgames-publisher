@@ -23,12 +23,13 @@ export interface PublisherProperty {
   name: string;
   domain: string;
   verified: boolean;
-  verificationMethod: 'dns_txt' | 'meta_tag' | 'file_upload';
+  verificationMethod: 'dns_txt' | 'meta_tag' | 'file_upload' | 'html_snippet';
   verificationToken: string;
   allowedOrigins: string[];
   publisherKey: string;
   createdAt: string;
   totalWidgets: number;
+  cmsPlatform?: InstallationPlatform;
 }
 
 export interface PublisherKey {
@@ -39,6 +40,40 @@ export interface PublisherKey {
   lastUsedAt?: string;
 }
 
+export type WidgetTemplateId = 
+  | 'carousel' 
+  | 'featured' 
+  | 'grid' 
+  | 'floating';
+
+export type WidgetLifecycleStatus = 
+  | 'draft' 
+  | 'ready_to_install' 
+  | 'checking_installation' 
+  | 'live' 
+  | 'installation_error' 
+  | 'paused';
+
+export type InstallationPlatform = 
+  | 'wordpress' 
+  | 'shopify' 
+  | 'webflow' 
+  | 'wix' 
+  | 'react' 
+  | 'other';
+
+export interface WidgetInstallation {
+  platform?: InstallationPlatform;
+  pageUrl?: string;
+  status: 'not_started' | 'awaiting_verification' | 'checking' | 'verified' | 'error';
+  lastCheckedAt?: string;
+  errorCode?: string;
+  errorMessage?: string;
+  verifiedAt?: string;
+  installedCodeFound?: boolean;
+  matchedOrigin?: boolean;
+}
+
 export type WidgetLayoutType = 
   | 'horizontal_stacked' 
   | 'vertical_stacked' 
@@ -47,15 +82,19 @@ export type WidgetLayoutType =
   | 'coverflow' 
   | 'featured_filmstrip' 
   | 'sidebar_mini_reel' 
-  | 'compact_grid';
+  | 'compact_grid'
+  | 'floating_button';
 
-export type WidgetPlacement = 'header' | 'in_content' | 'sidebar' | 'below_content' | 'custom';
+export type WidgetPlacement = 'header' | 'in_content' | 'sidebar' | 'below_content' | 'floating_overlay' | 'custom';
 
 export interface WidgetConfig {
   id: string;
   name: string;
   propertyId: string;
   propertyName: string;
+  templateId?: WidgetTemplateId;
+  lifecycleStatus?: WidgetLifecycleStatus;
+  installation?: WidgetInstallation;
   placement: WidgetPlacement;
   targetPageUrl: string;
   customScreenshotUrl?: string; // Data URL or URL of uploaded site/app screenshot
@@ -99,6 +138,7 @@ export interface WidgetConfig {
   publishedVersion?: number;
   createdAt: string;
   updatedAt: string;
+  lastSavedAt?: string;
   stats: {
     impressions: number;
     clicks: number;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Play, ChevronLeft, ChevronRight, Sparkles, Flame, Star, 
-  Gamepad2, Maximize2, ExternalLink 
+  Gamepad2, Maximize2, ExternalLink, X 
 } from 'lucide-react';
 import { WidgetConfig, GameItem } from '../../types';
 
@@ -22,6 +22,7 @@ export const DochWidgetRenderer: React.FC<DochWidgetRendererProps> = ({
 }) => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [hoveredGameId, setHoveredGameId] = useState<string | null>(null);
+  const [isFloatingOpen, setIsFloatingOpen] = useState<boolean>(true);
 
   // Filter games based on widget configuration
   const displayGames = games.filter(g => {
@@ -420,6 +421,92 @@ export const DochWidgetRenderer: React.FC<DochWidgetRendererProps> = ({
               ))}
             </div>
           </div>
+        </div>
+      );
+    }
+
+    // 7. Floating Launcher Button Layout
+    if (config.layout === 'floating_button') {
+      return (
+        <div className={`w-full p-4 relative flex flex-col items-end ${className}`}>
+          {isFloatingOpen && (
+            <div 
+              className={`mb-3 w-72 sm:w-80 border shadow-2xl transition-all duration-200 overflow-hidden ${themeClasses}`}
+              style={cardRadius}
+            >
+              <div className="flex items-center justify-between p-3 border-b border-slate-200/20 bg-slate-500/5">
+                <div className="flex items-center gap-2">
+                  <Gamepad2 className="w-4 h-4 text-blue-500" />
+                  <span className="font-display font-bold text-xs uppercase tracking-wider">
+                    Instant Games
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {config.appearance.showDochBranding && (
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      ⚡ DochGames
+                    </span>
+                  )}
+                  <button 
+                    onClick={() => setIsFloatingOpen(false)}
+                    className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-200/50 transition-colors"
+                    title="Close"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-2 space-y-2 max-h-72 overflow-y-auto">
+                {displayGames.map(game => (
+                  <div
+                    key={game.id}
+                    onClick={() => onPlayGame(game)}
+                    className={`flex items-center gap-2.5 p-2 rounded-xl cursor-pointer transition-all duration-150 ${
+                      isCloud ? 'hover:bg-slate-100' : 'hover:bg-slate-800/60'
+                    }`}
+                  >
+                    <img 
+                      src={game.media.thumbnailUrl} 
+                      alt={game.title} 
+                      className="w-12 h-12 rounded-lg object-cover shrink-0 shadow-xs" 
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-blue-500 font-semibold">{game.genre}</span>
+                        <span className="text-[10px] text-amber-400 font-mono">★ {game.stats.rating}</span>
+                      </div>
+                      <h5 className={`font-display text-xs font-bold leading-tight truncate ${isCloud ? 'text-slate-900' : 'text-white'}`}>
+                        {game.title}
+                      </h5>
+                    </div>
+                    <button 
+                      className="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shrink-0 shadow-xs"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPlayGame(game);
+                      }}
+                    >
+                      Play
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* The Launcher Button */}
+          <button
+            onClick={() => setIsFloatingOpen(!isFloatingOpen)}
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 border-2 border-white/20"
+            style={{ backgroundColor: config.appearance.primaryColor || '#2563EB' }}
+          >
+            <Gamepad2 className="w-4 h-4 animate-bounce" />
+            <span>Play Games</span>
+            <span className="px-1.5 py-0.5 text-[10px] font-bold bg-white/20 rounded-full">
+              {displayGames.length}
+            </span>
+          </button>
         </div>
       );
     }
