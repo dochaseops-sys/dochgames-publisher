@@ -145,7 +145,7 @@ export const TemplatePicker: React.FC<TemplatePickerProps> = ({
               }`}
             >
               {/* Recommended Badge */}
-              {tpl.recommended && (
+              {(tpl.recommended || tpl.isRecommended) && (
                 <div className="absolute -top-3 left-6 bg-[#D6F938] text-slate-950 px-3 py-0.5 rounded-full text-xs font-black shadow-sm flex items-center gap-1">
                   <Sparkles className="w-3 h-3 fill-current" />
                   Recommended for most sites
@@ -165,7 +165,7 @@ export const TemplatePicker: React.FC<TemplatePickerProps> = ({
                       {tpl.name}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                      Best placement: <span className="text-slate-800 font-semibold">{tpl.bestFor}</span>
+                      Best placement: <span className="text-slate-800 font-semibold">{tpl.bestFor || tpl.recommendedFor?.[0] || 'Editorial pages'}</span>
                     </p>
                   </div>
 
@@ -187,7 +187,7 @@ export const TemplatePicker: React.FC<TemplatePickerProps> = ({
 
                 {/* Key Benefits */}
                 <ul className="space-y-1.5 mb-5 border-t border-slate-100 pt-3">
-                  {tpl.features.map((feat, idx) => (
+                  {(tpl.features || tpl.recommendedFor || []).map((feat, idx) => (
                     <li key={idx} className="flex items-center gap-2 text-xs text-slate-600">
                       <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
                       <span>{feat}</span>

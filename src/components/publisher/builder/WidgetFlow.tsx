@@ -12,6 +12,7 @@ import { WidgetFlowProgress } from './WidgetFlowProgress';
 import { TemplatePicker } from './TemplatePicker';
 import { WidgetEditor } from './WidgetEditor';
 import { InstallationPage } from '../installation/InstallationPage';
+import { AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
 
 interface WidgetFlowProps {
   widgetId?: string;
@@ -29,11 +30,30 @@ export const WidgetFlow: React.FC<WidgetFlowProps> = ({
   onPlayGame
 }) => {
   const [step, setStep] = useState<1 | 2 | 3>(initialStep);
-  const [websites, setWebsites] = useState<PublisherProperty[]>([]);
-  const [widget, setWidget] = useState<WidgetConfig | null>(null);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<WidgetTemplateId>('carousel');
+  const [websites, setWebsites] = useState<PublisherProperty[]>(() => getWebsites());
+  
+  // Initialize widget synchronously to avoid any blank loading flash
+  const [widget, setWidget] = useState<WidgetConfig>(() => {
+    if (widgetId) {
+      const existing = getWidgetById(widgetId);
+      if (existing) return existing;
+    }
+    const props = getWebsites();
+    return createNewWidgetDraft('carousel', props[0]?.id);
+  });
 
-  // Load properties and widget
+  const [selectedTemplateId, setSelectedTemplateId] = useState<WidgetTemplateId>(() => {
+    return widget?.templateId || 'carousel';
+  });
+
+  // Keep step synchronized if caller changes initialStep
+  useEffect(() => {
+    if (initialStep) {
+      setStep(initialStep);
+    }
+  }, [initialStep]);
+
+  // Keep widget in sync if widgetId changes
   useEffect(() => {
     const props = getWebsites();
     setWebsites(props);
@@ -49,7 +69,7 @@ export const WidgetFlow: React.FC<WidgetFlowProps> = ({
       }
     }
 
-    // Otherwise initialize new draft widget
+    // New draft if no widgetId
     const newDraft = createNewWidgetDraft('carousel', props[0]?.id);
     setWidget(newDraft);
     setSelectedTemplateId('carousel');
@@ -57,8 +77,9 @@ export const WidgetFlow: React.FC<WidgetFlowProps> = ({
 
   if (!widget) {
     return (
-      <div className="min-h-[400px] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-[400px] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p className="text-xs text-slate-500">Preparing widget workspace...</p>
       </div>
     );
   }
@@ -95,7 +116,6 @@ export const WidgetFlow: React.FC<WidgetFlowProps> = ({
   };
 
   const handleStep2Continue = () => {
-    // When advancing to install, set lifecycle to ready_to_install if it's currently draft
     const nextStatus = widget.lifecycleStatus === 'draft' ? 'ready_to_install' : (widget.lifecycleStatus || 'ready_to_install');
     const updated = {
       ...widget,

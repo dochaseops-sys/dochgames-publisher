@@ -9,6 +9,7 @@ import { PublisherHelpPage } from './components/publisher/help/PublisherHelpPage
 import { ConnectPropertyModal } from './components/publisher/ConnectPropertyModal';
 import { PlayableGameModal } from './components/common/PlayableGameModal';
 import { NotificationCenter } from './components/notifications/NotificationCenter';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 import { 
   UserProfile, PublisherProperty, WidgetConfig, 
@@ -129,71 +130,73 @@ export function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full">
-        {/* TAB 1: HOME */}
-        {currentView === 'home' && (
-          <PublisherHomePage
-            widgets={widgets}
-            properties={properties}
-            onCreateWidget={() => handleCreateNewWidget()}
-            onSelectWidget={(wId, step) => handleSelectWidget(wId, step)}
-            onNavigateTab={(tab) => handleNavigate(tab)}
-            onConnectWebsite={() => setIsConnectModalOpen(true)}
-          />
-        )}
+        <ErrorBoundary onReset={() => { refreshData(); setCurrentView('home'); }}>
+          {/* TAB 1: HOME */}
+          {currentView === 'home' && (
+            <PublisherHomePage
+              widgets={widgets}
+              properties={properties}
+              onCreateWidget={() => handleCreateNewWidget()}
+              onSelectWidget={(wId, step) => handleSelectWidget(wId, step)}
+              onNavigateTab={(tab) => handleNavigate(tab)}
+              onConnectWebsite={() => setIsConnectModalOpen(true)}
+            />
+          )}
 
-        {/* TAB 2: WIDGETS */}
-        {currentView === 'widgets' && (
-          <WidgetsPage
-            widgets={widgets}
-            properties={properties}
-            onCreateWidget={() => handleCreateNewWidget()}
-            onSelectWidget={(wId, step) => handleSelectWidget(wId, step)}
-            onRefresh={refreshData}
-          />
-        )}
+          {/* TAB 2: WIDGETS */}
+          {currentView === 'widgets' && (
+            <WidgetsPage
+              widgets={widgets}
+              properties={properties}
+              onCreateWidget={() => handleCreateNewWidget()}
+              onSelectWidget={(wId, step) => handleSelectWidget(wId, step)}
+              onRefresh={refreshData}
+            />
+          )}
 
-        {/* CONTINUOUS 3-STEP BUILDER & INSTALLATION FLOW */}
-        {currentView === 'builder' && (
-          <WidgetFlow
-            widgetId={builderWidgetId}
-            initialStep={builderStep}
-            onFinish={() => {
-              refreshData();
-              setCurrentView('widgets');
-            }}
-            onViewAnalytics={() => {
-              refreshData();
-              setCurrentView('analytics');
-            }}
-            onPlayGame={(game) => setSelectedPlayableGame(game)}
-          />
-        )}
+          {/* CONTINUOUS 3-STEP BUILDER & INSTALLATION FLOW */}
+          {currentView === 'builder' && (
+            <WidgetFlow
+              widgetId={builderWidgetId}
+              initialStep={builderStep}
+              onFinish={() => {
+                refreshData();
+                setCurrentView('widgets');
+              }}
+              onViewAnalytics={() => {
+                refreshData();
+                setCurrentView('analytics');
+              }}
+              onPlayGame={(game) => setSelectedPlayableGame(game)}
+            />
+          )}
 
-        {/* TAB 3: ANALYTICS */}
-        {currentView === 'analytics' && (
-          <PublisherAnalyticsPage
-            widgets={widgets}
-            onSelectWidget={(wId, step) => handleSelectWidget(wId, step)}
-          />
-        )}
+          {/* TAB 3: ANALYTICS */}
+          {currentView === 'analytics' && (
+            <PublisherAnalyticsPage
+              widgets={widgets}
+              onSelectWidget={(wId, step) => handleSelectWidget(wId, step)}
+            />
+          )}
 
-        {/* TAB 4: WEBSITES */}
-        {currentView === 'websites' && (
-          <WebsitesPage
-            websites={properties}
-            onRefresh={refreshData}
-            onCreateWidgetForWebsite={(propId) => handleCreateNewWidget(propId)}
-            onViewWidgetsForWebsite={(propId) => {
-              refreshData();
-              setCurrentView('widgets');
-            }}
-          />
-        )}
+          {/* TAB 4: WEBSITES */}
+          {currentView === 'websites' && (
+            <WebsitesPage
+              websites={properties}
+              onRefresh={refreshData}
+              onCreateWidgetForWebsite={(propId) => handleCreateNewWidget(propId)}
+              onViewWidgetsForWebsite={(propId) => {
+                refreshData();
+                setCurrentView('widgets');
+              }}
+            />
+          )}
 
-        {/* TAB 5: HELP */}
-        {currentView === 'help' && (
-          <PublisherHelpPage />
-        )}
+          {/* TAB 5: HELP */}
+          {currentView === 'help' && (
+            <PublisherHelpPage />
+          )}
+        </ErrorBoundary>
       </main>
 
       {/* Professional, Clean Footer */}
