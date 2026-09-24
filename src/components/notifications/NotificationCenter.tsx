@@ -197,16 +197,11 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1 mb-1.5">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md shrink-0">
-                        {notif.actor?.name || 'DochGames'}
-                      </span>
-                      <h3 className={`text-xs font-bold truncate ${notif.read ? 'text-slate-800' : 'text-slate-950 font-black'}`}>
-                        {notif.title}
-                      </h3>
-                    </div>
-                    <span className="text-[10px] text-slate-400 shrink-0 font-medium ml-2">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <h3 className={`text-xs font-bold truncate ${notif.read ? 'text-slate-800' : 'text-slate-950 font-black'}`}>
+                      {notif.title}
+                    </h3>
+                    <span className="text-[10px] text-slate-400 shrink-0 font-medium">
                       {formatTimestamp(notif.timestamp)}
                     </span>
                   </div>
