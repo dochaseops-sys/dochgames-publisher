@@ -646,172 +646,78 @@ export const INITIAL_USERS = [
 export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
   {
     id: 'notif-001',
-    category: 'audit',
+    category: 'activity',
     severity: 'success',
-    title: 'Pre-Flight Sandbox Security Audit Passed',
-    message: 'Automated container scan completed for "Cyber Neon Racer v1.4.2". Zero unsafe eval(), iframe cross-origin escapes, or telemetry leaks detected.',
-    timestamp: '2026-09-23T05:08:00Z',
+    title: 'Widget Installed & Live',
+    message: 'Your widget "Homepage Trending Arcade Slit" is confirmed on gamezone-daily.com and is now actively serving games.',
+    timestamp: '2026-09-24T10:30:00Z',
     read: false,
     actor: {
-      name: 'DochGames Sentinel Bot',
-      role: 'Automated QA Engine'
+      name: 'Verification Bot',
+      role: 'System'
     },
-    auditDetails: {
-      entityType: 'game',
-      entityId: 'game-001',
-      entityName: 'Cyber Neon Racer v1.4.2',
-      action: 'SANDBOX_SECURITY_VERIFICATION',
-      ipOrOrigin: 'cdn.dochgames.com/sandboxes/game-001',
-      result: 'verified',
-      checkDetails: 'CSP Strict Compliance, HTTPS Enforced, AudioContext User-Gesture Safe, 0 External Trackers'
-    },
-    actionLabel: 'Inspect Sandbox Log',
-    actionView: 'admin_console'
+    actionLabel: 'View Widgets',
+    actionView: 'widgets'
   },
   {
     id: 'notif-002',
-    category: 'activity',
-    severity: 'info',
-    title: 'New Widget Deployed on Verified Domain',
-    message: 'Alex Mercer deployed "Trending Gaming Slit Reel" on gamezone-daily.com/reviews. Live requests are serving from London Edge CDN.',
-    timestamp: '2026-09-23T04:42:00Z',
+    category: 'revenue',
+    severity: 'success',
+    title: 'Monthly Revenue Settled',
+    message: 'Your property earned $3,480.20 in publisher syndication rev-share for the previous period (980,000 ad impressions served).',
+    timestamp: '2026-09-23T14:10:00Z',
     read: false,
     actor: {
-      name: 'Alex Mercer',
-      role: 'Publisher'
+      name: 'Finance & Ledger',
+      role: 'DochGames Finance'
     },
-    auditDetails: {
-      entityType: 'widget',
-      entityId: 'wdg-01',
-      entityName: 'Trending Gaming Slit Reel',
-      action: 'WIDGET_DEPLOYED',
-      ipOrOrigin: 'gamezone-daily.com',
-      result: 'success',
-      checkDetails: 'Slot: header · Container: #doch-widget-wdg-01 · Size: responsive_full'
-    },
-    actionLabel: 'View Widget',
-    actionView: 'my_widgets'
+    actionLabel: 'View Analytics',
+    actionView: 'analytics'
   },
   {
     id: 'notif-003',
-    category: 'audit',
-    severity: 'warning',
-    title: 'Domain Origin Audit: Wildcard Whitelist Restricted',
-    message: 'Publisher property "ArcadePulse Mobile" attempted wildcard origin (*.arcadepulse.io). Security policy restricted origin to strict HTTPS domains.',
-    timestamp: '2026-09-23T03:30:00Z',
-    read: false,
-    actor: {
-      name: 'DochGames Security Daemon',
-      role: 'System'
-    },
-    auditDetails: {
-      entityType: 'property',
-      entityId: 'prop-03',
-      entityName: 'ArcadePulse Mobile',
-      action: 'ORIGIN_WHITELIST_AUDIT',
-      ipOrOrigin: 'https://app.arcadepulse.io',
-      result: 'flagged',
-      checkDetails: 'Wildcard * disallowed in production publisher keys. Restricted to verified HTTPS subdomains.'
-    },
-    actionLabel: 'Review Property',
-    actionView: 'admin_console'
-  },
-  {
-    id: 'notif-004',
-    category: 'activity',
-    severity: 'success',
-    title: 'Game Approved for Global Syndication',
-    message: 'Liam Vance (DochGames Admin) approved "Voxel Kingdom Defense" for instant browser distribution across all verified partner networks.',
-    timestamp: '2026-09-22T21:15:00Z',
-    read: true,
-    actor: {
-      name: 'Liam Vance',
-      role: 'DochGames Admin'
-    },
-    auditDetails: {
-      entityType: 'game',
-      entityId: 'game-004',
-      entityName: 'Voxel Kingdom Defense',
-      action: 'QA_APPROVAL_ISSUED',
-      result: 'verified',
-      checkDetails: 'Passed touch controls test, 60fps WebGL rendering verified, age rating verified.'
-    },
-    actionLabel: 'View Portfolio',
-    actionView: 'my_games'
-  },
-  {
-    id: 'notif-005',
-    category: 'system',
-    severity: 'info',
-    title: 'Global Edge CDN v2.8 Caching Rolled Out',
-    message: 'Asset delivery latency reduced by 14ms across US-East, EU-Central, and APAC regions. WebGL game bundle decompression is now handled at the edge.',
-    timestamp: '2026-09-22T18:00:00Z',
-    read: true,
-    actor: {
-      name: 'DochGames Infrastructure',
-      role: 'System'
-    },
-    metadata: {
-      regions: ['US-East', 'EU-West', 'EU-Central', 'APAC-Tokyo'],
-      avgPingReductionMs: 14.2
-    }
-  },
-  {
-    id: 'notif-006',
-    category: 'audit',
-    severity: 'success',
-    title: 'DNS TXT & ads.txt Verification Completed',
-    message: 'Domain "gamezone-daily.com" confirmed ownership via DNS TXT record `dochgames-verification=9921-prod`. Ads.txt lines successfully parsed.',
-    timestamp: '2026-09-22T16:20:00Z',
-    read: true,
-    actor: {
-      name: 'Domain Registrar Bot',
-      role: 'Automated QA Engine'
-    },
-    auditDetails: {
-      entityType: 'property',
-      entityId: 'prop-01',
-      entityName: 'gamezone-daily.com',
-      action: 'DNS_OWNERSHIP_VERIFICATION',
-      ipOrOrigin: '104.21.44.182',
-      result: 'verified',
-      checkDetails: 'DNS TXT record match: VALID · CMP TCF v2.2 compliance: VALID'
-    }
-  },
-  {
-    id: 'notif-007',
-    category: 'revenue',
-    severity: 'success',
-    title: 'Monthly Syndication Revenue Settled',
-    message: 'Your property generated $3,480.20 in publisher syndication rev-share for the previous period (980,000 ad impressions served).',
-    timestamp: '2026-09-22T14:10:00Z',
-    read: true,
-    actor: {
-      name: 'Billing & Ledger',
-      role: 'DochGames Finance'
-    },
-    metadata: {
-      amount: '$3,480.20',
-      payoutMethod: 'Stripe Connect Direct',
-      tier: 'Platinum (85/15 split)'
-    },
-    actionLabel: 'View Analytics',
-    actionView: 'publisher_analytics'
-  },
-  {
-    id: 'notif-008',
     category: 'activity',
     severity: 'info',
-    title: 'Traffic Milestone: 50,000 Daily Plays Exceeded',
-    message: 'Game "Cyber Neon Racer" surpassed 50,000 player sessions today across syndicated partner widgets (+215% growth week-over-week).',
+    title: '50,000 Plays Milestone Reached',
+    message: 'Your widgets passed 50,000 player sessions today across your websites (+215% growth week-over-week).',
     timestamp: '2026-09-22T11:05:00Z',
     read: true,
     actor: {
-      name: 'DochGames Telemetry',
+      name: 'Telemetry Engine',
       role: 'System'
     },
     actionLabel: 'View Performance',
-    actionView: 'dashboard'
+    actionView: 'analytics'
+  },
+  {
+    id: 'notif-004',
+    category: 'system',
+    severity: 'info',
+    title: 'New Games Added to Catalogue',
+    message: '3 new instant web games ("Pixel Gem Cascade", "Galactic Orbit Defense", and "Neon Drifter") are now available for your widgets.',
+    timestamp: '2026-09-21T09:00:00Z',
+    read: true,
+    actor: {
+      name: 'Game Curation Team',
+      role: 'DochGames Games'
+    },
+    actionLabel: 'Customise Widgets',
+    actionView: 'widgets'
+  },
+  {
+    id: 'notif-005',
+    category: 'activity',
+    severity: 'success',
+    title: 'Website Connected',
+    message: 'Domain "gamezone-daily.com" was successfully connected and verified with your publisher key.',
+    timestamp: '2026-09-20T16:20:00Z',
+    read: true,
+    actor: {
+      name: 'Domain Registrar Bot',
+      role: 'System'
+    },
+    actionLabel: 'Manage Websites',
+    actionView: 'websites'
   }
 ];
 
