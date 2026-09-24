@@ -204,7 +204,6 @@ export function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="font-display font-bold text-slate-900">DochGames Publisher Platform</span>
-            <span>· Instant HTML5 & WebGL Game Syndication</span>
           </div>
           <div className="flex items-center gap-4 text-xs text-slate-500">
             <button onClick={() => setCurrentView('help')} className="hover:text-blue-600 transition-colors">
