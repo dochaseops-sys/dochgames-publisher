@@ -6,8 +6,10 @@ import { WidgetFlow } from './components/publisher/builder/WidgetFlow';
 import { PublisherAnalyticsPage } from './components/publisher/analytics/PublisherAnalyticsPage';
 import { WebsitesPage } from './components/publisher/websites/WebsitesPage';
 import { PublisherHelpPage } from './components/publisher/help/PublisherHelpPage';
+import { PublisherSettingsPage } from './components/publisher/profile/PublisherSettingsPage';
 import { ConnectPropertyModal } from './components/publisher/ConnectPropertyModal';
 import { PlayableGameModal } from './components/common/PlayableGameModal';
+import { SignOutConfirmationModal } from './components/common/SignOutConfirmationModal';
 import { NotificationCenter } from './components/notifications/NotificationCenter';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 
@@ -20,12 +22,20 @@ import {
 } from './data/mockData';
 import { getWebsites } from './services/websites';
 import { getWidgets } from './services/widgets';
+import { publisherProfileService } from './services/publisherProfile';
+import { PublisherProfile, PublisherBusiness } from './types/publisherProfile';
+import { LogIn } from 'lucide-react';
 
 export function App() {
   // Current user state (Publisher)
   const [currentUser] = useState<UserProfile>(initialUsers[0]);
-  
+  const [publisherProfile, setPublisherProfile] = useState<PublisherProfile | null>(null);
+  const [publisherBusiness, setPublisherBusiness] = useState<PublisherBusiness | null>(null);
+  const [isSignedOut, setIsSignedOut] = useState<boolean>(false);
+  const [isSignOutModalOpen, setIsSignOutModalOpen] = useState<boolean>(false);
+
   // 5 Top-level Navigation views: 'home' | 'widgets' | 'analytics' | 'websites' | 'help'
+  // Profile settings view: 'profile_settings'
   // Sub-flow view: 'builder' (3-step continuous flow)
   const [currentView, setCurrentView] = useState<string>('home');
 
@@ -53,6 +63,8 @@ export function App() {
 
   useEffect(() => {
     refreshData();
+    publisherProfileService.getProfile().then(p => setPublisherProfile(p));
+    publisherProfileService.getBusiness().then(b => setPublisherBusiness(b));
   }, []);
 
   const unreadNotificationsCount = notifications.filter(n => !n.read).length;
@@ -87,7 +99,7 @@ export function App() {
     setCurrentView('builder');
   };
 
-  // Navigation mapper to support legacy triggers
+  // Navigation mapper
   const handleNavigate = (view: string) => {
     if (view === 'dashboard' || view === 'home') {
       setCurrentView('home');
@@ -110,22 +122,68 @@ export function App() {
       setCurrentView('websites');
     } else if (view === 'help') {
       setCurrentView('help');
+    } else if (view === 'profile_settings' || view === 'profile' || view === 'settings') {
+      setCurrentView('profile_settings');
     } else {
       setCurrentView(view);
     }
   };
 
+  const handleConfirmSignOut = () => {
+    setIsSignOutModalOpen(false);
+    setIsSignedOut(true);
+  };
+
+  const handleSignInAgain = () => {
+    setIsSignedOut(false);
+    setCurrentView('home');
+    refreshData();
+    publisherProfileService.getProfile().then(p => setPublisherProfile(p));
+    publisherProfileService.getBusiness().then(b => setPublisherBusiness(b));
+  };
+
+  if (isSignedOut) {
+    return (
+      <div className="min-h-screen bg-[#F4F6FA] flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-slate-200/90 shadow-lg text-center space-y-5 animate-in fade-in duration-200">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-xs">
+            <LogIn className="w-7 h-7" />
+          </div>
+          <div>
+            <h2 className="text-xl font-display font-black text-slate-900">
+              You have been signed out
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Your active session has ended safely. Your live embedded widgets continue serving games uninterrupted.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleSignInAgain}
+            className="w-full py-3 rounded-2xl bg-[#D6F938] hover:bg-[#cbf026] text-slate-950 font-black text-xs transition-all shadow-sm active:scale-98 cursor-pointer"
+          >
+            Sign back in to DochGames
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F4F6FA] text-slate-800 flex flex-col font-sans selection:bg-[#D6F938] selection:text-slate-950">
-      {/* 5-Tab Top Navigation Bar */}
+      {/* 5-Tab Top Navigation Bar with Avatar Dropdown */}
       <Navbar
         currentView={currentView}
         currentUser={currentUser}
+        publisherName={publisherProfile?.fullName || currentUser.name}
+        companyName={publisherBusiness?.name || currentUser.companyOrStudio}
+        avatarUrl={publisherProfile?.avatarUrl}
         unreadNotificationsCount={unreadNotificationsCount}
         onOpenNotifications={() => setIsNotificationsOpen(true)}
         onNavigate={handleNavigate}
         onCreateWidget={() => handleCreateNewWidget()}
         onOpenConnectModal={() => setIsConnectModalOpen(true)}
+        onSignOut={() => setIsSignOutModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -196,6 +254,18 @@ export function App() {
           {currentView === 'help' && (
             <PublisherHelpPage />
           )}
+
+          {/* PROFILE & SETTINGS (Accessible via Avatar dropdown) */}
+          {currentView === 'profile_settings' && (
+            <PublisherSettingsPage
+              properties={properties}
+              onNavigateHome={() => handleNavigate('home')}
+              onNavigateWebsites={() => handleNavigate('websites')}
+              onSignOut={() => setIsSignOutModalOpen(true)}
+              onProfileUpdated={(updated) => setPublisherProfile(updated)}
+              onBusinessUpdated={(updated) => setPublisherBusiness(updated)}
+            />
+          )}
         </ErrorBoundary>
       </main>
 
@@ -253,6 +323,13 @@ export function App() {
           refreshData();
           setIsConnectModalOpen(false);
         }}
+      />
+
+      {/* Sign Out Confirmation Modal */}
+      <SignOutConfirmationModal
+        isOpen={isSignOutModalOpen}
+        onClose={() => setIsSignOutModalOpen(false)}
+        onConfirmSignOut={handleConfirmSignOut}
       />
     </div>
   );

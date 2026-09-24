@@ -351,3 +351,5 @@ export interface NotificationAlertSettings {
   browserPushEnabled: boolean;
   weeklyDigestEnabled: boolean;
 }
+
+export * from './publisherProfile';
