@@ -648,76 +648,76 @@ export const INITIAL_NOTIFICATIONS: PlatformNotification[] = [
     id: 'notif-001',
     category: 'activity',
     severity: 'success',
-    title: 'Widget Installed & Live',
-    message: 'Your widget "Homepage Trending Arcade Slit" is confirmed on gamezone-daily.com and is now actively serving games.',
+    title: 'Your game widget is now live!',
+    message: 'Your widget "Homepage Trending Arcade" is working on gamezone-daily.com. Visitors can now enjoy instant games on your site.',
     timestamp: '2026-09-24T10:30:00Z',
     read: false,
     actor: {
-      name: 'Verification Bot',
-      role: 'System'
+      name: 'DochGames Team',
+      role: 'Support'
     },
-    actionLabel: 'View Widgets',
+    actionLabel: 'View widget',
     actionView: 'widgets'
   },
   {
     id: 'notif-002',
     category: 'revenue',
     severity: 'success',
-    title: 'Monthly Revenue Settled',
-    message: 'Your property earned $3,480.20 in publisher syndication rev-share for the previous period (980,000 ad impressions served).',
+    title: 'Monthly earnings ready: $3,480.20',
+    message: 'You earned $3,480.20 from games played on your website last month. The payout has been transferred to your account.',
     timestamp: '2026-09-23T14:10:00Z',
     read: false,
     actor: {
-      name: 'Finance & Ledger',
-      role: 'DochGames Finance'
+      name: 'DochGames Payouts',
+      role: 'Finance'
     },
-    actionLabel: 'View Analytics',
+    actionLabel: 'View earnings',
     actionView: 'analytics'
   },
   {
     id: 'notif-003',
     category: 'activity',
     severity: 'info',
-    title: '50,000 Plays Milestone Reached',
-    message: 'Your widgets passed 50,000 player sessions today across your websites (+215% growth week-over-week).',
+    title: 'Milestone: 50,000 games played!',
+    message: 'Visitors have now played more than 50,000 games on your website. Your audience engagement is growing quickly!',
     timestamp: '2026-09-22T11:05:00Z',
     read: true,
     actor: {
-      name: 'Telemetry Engine',
-      role: 'System'
+      name: 'DochGames Team',
+      role: 'Community'
     },
-    actionLabel: 'View Performance',
+    actionLabel: 'See performance',
     actionView: 'analytics'
   },
   {
     id: 'notif-004',
     category: 'system',
     severity: 'info',
-    title: 'New Games Added to Catalogue',
-    message: '3 new instant web games ("Pixel Gem Cascade", "Galactic Orbit Defense", and "Neon Drifter") are now available for your widgets.',
+    title: '3 new games added to your collection',
+    message: 'We added 3 fun new games ("Pixel Gem Cascade", "Galactic Orbit Defense", and "Neon Drifter") that you can show in your widgets.',
     timestamp: '2026-09-21T09:00:00Z',
     read: true,
     actor: {
-      name: 'Game Curation Team',
-      role: 'DochGames Games'
+      name: 'DochGames Team',
+      role: 'Games'
     },
-    actionLabel: 'Customise Widgets',
+    actionLabel: 'Customise widget',
     actionView: 'widgets'
   },
   {
     id: 'notif-005',
     category: 'activity',
     severity: 'success',
-    title: 'Website Connected',
-    message: 'Domain "gamezone-daily.com" was successfully connected and verified with your publisher key.',
+    title: 'Website connected successfully',
+    message: 'gamezone-daily.com is ready. You can now add game widgets to your pages whenever you like.',
     timestamp: '2026-09-20T16:20:00Z',
     read: true,
     actor: {
-      name: 'Domain Registrar Bot',
-      role: 'System'
+      name: 'DochGames Team',
+      role: 'Support'
     },
-    actionLabel: 'Manage Websites',
-    actionView: 'websites'
+    actionLabel: 'Create a widget',
+    actionView: 'widgets'
   }
 ];
 
