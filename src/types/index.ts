@@ -353,3 +353,4 @@ export interface NotificationAlertSettings {
 }
 
 export * from './publisherProfile';
+export * from './auth';

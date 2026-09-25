@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Gamepad2, Plus, Bell, Home, Layers, BarChart3, Globe, 
-  HelpCircle, User, LogOut, ChevronDown 
+  HelpCircle, User, LogOut, LogIn, ChevronDown 
 } from 'lucide-react';
 import { UserRole, UserProfile } from '../../types';
 
@@ -245,6 +245,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                     >
                       <HelpCircle className="w-4 h-4 text-slate-500" />
                       <span>Help & Documentation</span>
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        onNavigate('signin');
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-2.5 transition-colors"
+                    >
+                      <LogIn className="w-4 h-4 text-slate-500" />
+                      <span>Switch account / Sign in</span>
                     </button>
                   </div>
 

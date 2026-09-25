@@ -12,30 +12,35 @@ import { PlayableGameModal } from './components/common/PlayableGameModal';
 import { SignOutConfirmationModal } from './components/common/SignOutConfirmationModal';
 import { NotificationCenter } from './components/notifications/NotificationCenter';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { AuthLayout } from './components/auth/AuthLayout';
 
 import { 
   UserProfile, PublisherProperty, WidgetConfig, 
   GameItem, PlatformNotification 
 } from './types';
 import { 
-  mockGames, mockNotifications, initialUsers 
+  mockNotifications, initialUsers 
 } from './data/mockData';
 import { getWebsites } from './services/websites';
 import { getWidgets } from './services/widgets';
 import { publisherProfileService } from './services/publisherProfile';
+import { authService } from './services/authService';
 import { PublisherProfile, PublisherBusiness } from './types/publisherProfile';
-import { LogIn } from 'lucide-react';
+import { AuthUser } from './types/auth';
 
 export function App() {
   // Current user state (Publisher)
   const [currentUser] = useState<UserProfile>(initialUsers[0]);
   const [publisherProfile, setPublisherProfile] = useState<PublisherProfile | null>(null);
   const [publisherBusiness, setPublisherBusiness] = useState<PublisherBusiness | null>(null);
-  const [isSignedOut, setIsSignedOut] = useState<boolean>(false);
+
+  // Authentication session state
+  const [isSignedOut, setIsSignedOut] = useState<boolean>(() => !authService.getSession().isAuthenticated);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState<boolean>(false);
 
   // 5 Top-level Navigation views: 'home' | 'widgets' | 'analytics' | 'websites' | 'help'
   // Profile settings view: 'profile_settings'
+  // Auth views: 'signin' | 'signup'
   // Sub-flow view: 'builder' (3-step continuous flow)
   const [currentView, setCurrentView] = useState<string>('home');
 
@@ -65,6 +70,12 @@ export function App() {
     refreshData();
     publisherProfileService.getProfile().then(p => setPublisherProfile(p));
     publisherProfileService.getBusiness().then(b => setPublisherBusiness(b));
+
+    // Subscribe to auth state updates
+    const unsubscribe = authService.subscribe((session) => {
+      setIsSignedOut(!session.isAuthenticated);
+    });
+    return () => unsubscribe();
   }, []);
 
   const unreadNotificationsCount = notifications.filter(n => !n.read).length;
@@ -124,17 +135,23 @@ export function App() {
       setCurrentView('help');
     } else if (view === 'profile_settings' || view === 'profile' || view === 'settings') {
       setCurrentView('profile_settings');
+    } else if (view === 'signin' || view === 'sign_in' || view === 'login') {
+      setCurrentView('signin');
+    } else if (view === 'signup' || view === 'sign_up' || view === 'register') {
+      setCurrentView('signup');
     } else {
       setCurrentView(view);
     }
   };
 
-  const handleConfirmSignOut = () => {
+  const handleConfirmSignOut = async () => {
+    await authService.signOut();
     setIsSignOutModalOpen(false);
     setIsSignedOut(true);
+    setCurrentView('signin');
   };
 
-  const handleSignInAgain = () => {
+  const handleAuthSuccess = (user: AuthUser) => {
     setIsSignedOut(false);
     setCurrentView('home');
     refreshData();
@@ -142,30 +159,14 @@ export function App() {
     publisherProfileService.getBusiness().then(b => setPublisherBusiness(b));
   };
 
-  if (isSignedOut) {
+  // Render Authentication Layout when signed out or when viewing Sign In / Sign Up
+  if (isSignedOut || currentView === 'signin' || currentView === 'signup') {
     return (
-      <div className="min-h-screen bg-[#F4F6FA] flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-slate-200/90 shadow-lg text-center space-y-5 animate-in fade-in duration-200">
-          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-xs">
-            <LogIn className="w-7 h-7" />
-          </div>
-          <div>
-            <h2 className="text-xl font-display font-black text-slate-900">
-              You have been signed out
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Your active session has ended safely. Your live embedded widgets continue serving games uninterrupted.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleSignInAgain}
-            className="w-full py-3 rounded-2xl bg-[#D6F938] hover:bg-[#cbf026] text-slate-950 font-black text-xs transition-all shadow-sm active:scale-98 cursor-pointer"
-          >
-            Sign back in to DochGames
-          </button>
-        </div>
-      </div>
+      <AuthLayout
+        initialMode={currentView === 'signup' ? 'signup' : 'signin'}
+        onAuthSuccess={handleAuthSuccess}
+        onBackToApp={!isSignedOut ? () => setCurrentView('home') : undefined}
+      />
     );
   }
 
