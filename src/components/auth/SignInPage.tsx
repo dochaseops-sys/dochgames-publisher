@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, LogIn, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { AuthUser } from '../../types/auth';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
@@ -13,23 +13,49 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   onSuccess,
   onNavigateToSignUp
 }) => {
-  const [email, setEmail] = useState('alex.mercer@gamezone-daily.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
+
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setFieldErrors({});
+    setServerError(null);
+
+    const errors: { email?: string; password?: string } = {};
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      errors.email = 'Enter a valid email address.';
+    }
+    if (!password) {
+      errors.password = 'Enter your password.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      if (errors.email) {
+        emailInputRef.current?.focus();
+      } else if (errors.password) {
+        passwordInputRef.current?.focus();
+      }
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const res = await authService.signIn({
-        email: email.trim(),
+        email: cleanEmail,
         password: password.trim(),
         rememberMe
       });
@@ -37,17 +63,18 @@ export const SignInPage: React.FC<SignInPageProps> = ({
       if (res.success && res.user) {
         onSuccess(res.user);
       } else {
-        setError(res.message || 'Unable to sign in. Please check your credentials.');
+        setServerError(res.message || 'Unable to sign in. Please check your credentials.');
       }
     } catch {
-      setError('A connection error occurred. Please try again.');
+      setServerError('A connection error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDemoSignIn = async () => {
-    setError(null);
+    setFieldErrors({});
+    setServerError(null);
     setIsLoading(true);
     try {
       const res = await authService.signInDemo();
@@ -55,14 +82,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({
         onSuccess(res.user);
       }
     } catch {
-      setError('Could not sign in with demo account.');
+      setServerError('Could not open demo workspace.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setError(null);
+    setFieldErrors({});
+    setServerError(null);
     setIsLoading(true);
     try {
       const res = await authService.signInWithGoogle();
@@ -70,50 +98,45 @@ export const SignInPage: React.FC<SignInPageProps> = ({
         onSuccess(res.user);
       }
     } catch {
-      setError('Could not sign in with Google.');
+      setServerError('Could not sign in with Google.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in duration-200">
+    <div className="w-full max-w-md mx-auto space-y-6">
       {/* Title & Introduction */}
       <div className="space-y-1.5 text-left">
         <h2 className="text-2xl sm:text-3xl font-display font-black text-slate-900 tracking-tight">
-          Sign in to DochGames
+          Welcome back
         </h2>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium">
-          Access your publisher portal, live widgets, and ad revenue stats.
+        <p className="text-sm text-slate-600 font-normal leading-relaxed">
+          Sign in to manage your websites, widgets and performance.
         </p>
       </div>
 
-      {/* Quick Demo Access Pill */}
-      <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200/70 flex items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-2 text-blue-900 font-semibold min-w-0">
-          <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
-          <span className="truncate">Evaluating platform? Use 1-click demo</span>
-        </div>
-        <button
-          type="button"
-          onClick={handleDemoSignIn}
-          disabled={isLoading}
-          className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shrink-0 shadow-xs"
+      {/* Top Level Server Error Banner */}
+      {serverError && (
+        <div 
+          className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2.5 text-xs font-medium"
+          aria-live="polite"
         >
-          Sign in as Alex
-        </button>
-      </div>
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{serverError}</span>
+        </div>
+      )}
 
-      {/* Social Single Sign-On Options */}
-      <div className="space-y-2.5">
+      {/* Google Single Sign-On */}
+      <div>
         <button
           type="button"
           onClick={handleGoogleSignIn}
           disabled={isLoading}
-          className="w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs transition-all flex items-center justify-center gap-2.5 shadow-2xs"
+          className="w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all flex items-center justify-center gap-2.5 shadow-2xs"
         >
           {/* Official Google G Logo */}
-          <svg className="w-4 h-4" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -135,43 +158,48 @@ export const SignInPage: React.FC<SignInPageProps> = ({
         </button>
       </div>
 
-      {/* Divider */}
+      {/* Divider with matching white background */}
       <div className="relative flex items-center justify-center">
         <div className="border-t border-slate-200 w-full" />
-        <span className="bg-[#F4F6FA] px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 absolute">
-          Or with email
+        <span className="bg-white px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 absolute">
+          Or continue with email
         </span>
       </div>
 
-      {/* Error Notice */}
-      {error && (
-        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2.5 text-xs font-medium">
-          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
       {/* Sign In Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {/* Email Field */}
         <div>
           <label htmlFor="signin-email" className="block text-xs font-bold text-slate-700 mb-1.5">
-            Work email address
+            Email address
           </label>
           <div className="relative">
             <input
+              ref={emailInputRef}
               id="signin-email"
               type="email"
+              name="email"
+              autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="alex.mercer@gamezone-daily.com"
-              className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-600 transition-all font-medium"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (fieldErrors.email) setFieldErrors(prev => ({ ...prev, email: undefined }));
+              }}
+              placeholder="name@yourpublication.com"
+              className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-600 transition-all font-medium ${
+                fieldErrors.email ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200 hover:border-slate-300'
+              }`}
               required
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <Mail className="w-4 h-4" />
             </div>
           </div>
+          {fieldErrors.email && (
+            <p className="mt-1.5 text-xs text-rose-600 font-medium" aria-live="polite">
+              {fieldErrors.email}
+            </p>
+          )}
         </div>
 
         {/* Password Field */}
@@ -183,19 +211,27 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             <button
               type="button"
               onClick={() => setIsForgotModalOpen(true)}
-              className="text-xs text-blue-600 hover:text-blue-800 font-bold transition-colors"
+              className="text-xs text-blue-600 hover:text-blue-800 font-semibold transition-colors"
             >
               Forgot password?
             </button>
           </div>
           <div className="relative">
             <input
+              ref={passwordInputRef}
               id="signin-password"
               type={showPassword ? 'text' : 'password'}
+              name="password"
+              autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (fieldErrors.password) setFieldErrors(prev => ({ ...prev, password: undefined }));
+              }}
               placeholder="Enter your password"
-              className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 hover:border-slate-300 text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-600 transition-all font-medium"
+              className={`w-full pl-9 pr-10 py-2.5 rounded-xl border text-sm text-slate-900 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-600 transition-all font-medium ${
+                fieldErrors.password ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200 hover:border-slate-300'
+              }`}
               required
             />
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -210,10 +246,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
+          {fieldErrors.password && (
+            <p className="mt-1.5 text-xs text-rose-600 font-medium" aria-live="polite">
+              {fieldErrors.password}
+            </p>
+          )}
         </div>
 
-        {/* Remember Me */}
-        <div className="flex items-center justify-between text-xs pt-1">
+        {/* Keep Me Signed In */}
+        <div className="flex items-center text-xs pt-0.5">
           <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600">
             <input
               type="checkbox"
@@ -221,31 +262,42 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               onChange={(e) => setRememberMe(e.target.checked)}
               className="w-4 h-4 text-blue-600 rounded-sm focus:ring-blue-500 cursor-pointer"
             />
-            <span>Remember this device for 30 days</span>
+            <span>Keep me signed in</span>
           </label>
         </div>
 
-        {/* Submit Button */}
+        {/* Primary Sign In Button */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 px-4 rounded-xl bg-[#D6F938] hover:bg-[#cbf026] text-slate-950 font-black text-xs transition-all shadow-sm active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+          className="w-full py-3 px-4 rounded-xl bg-[#D6F938] hover:bg-[#cbf026] text-slate-950 font-black text-sm transition-all shadow-sm active:scale-98 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
         >
           <LogIn className="w-4 h-4 stroke-[2.5]" />
-          <span>{isLoading ? 'Signing in…' : 'Sign in to publisher portal'}</span>
+          <span>{isLoading ? 'Signing in…' : 'Sign in'}</span>
         </button>
       </form>
 
-      {/* Footer Switcher */}
-      <div className="pt-2 text-center text-xs text-slate-500">
+      {/* Account Switcher Link */}
+      <div className="pt-2 text-center text-sm text-slate-600">
         New to DochGames?{' '}
         <button
           type="button"
           onClick={onNavigateToSignUp}
-          className="text-blue-600 hover:text-blue-800 font-bold transition-colors inline-flex items-center gap-0.5"
+          className="text-blue-600 hover:text-blue-800 font-bold transition-colors inline-block"
         >
-          <span>Create a publisher account</span>
-          <ArrowRight className="w-3 h-3" />
+          Create an account
+        </button>
+      </div>
+
+      {/* Quiet Tertiary Demo Link (Moved below the form) */}
+      <div className="pt-2 border-t border-slate-100 text-center">
+        <button
+          type="button"
+          onClick={handleDemoSignIn}
+          disabled={isLoading}
+          className="text-xs text-slate-500 hover:text-slate-800 transition-colors inline-flex items-center gap-1 font-medium hover:underline"
+        >
+          <span>Just exploring? Open the demo workspace</span>
         </button>
       </div>
 

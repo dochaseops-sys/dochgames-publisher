@@ -22,7 +22,7 @@ export interface SignUpData {
   fullName: string;
   email: string;
   password: string;
-  websiteDomain: string;
+  websiteDomain?: string;
   companyName?: string;
   agreedToTerms: boolean;
   newsletterOptIn?: boolean;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Mail, Check, AlertCircle, ArrowLeft } from 'lucide-react';
 import { authService } from '../../services/authService';
 
@@ -17,15 +17,19 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 }) => {
   const [email, setEmail] = useState(initialEmail);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       setEmail(initialEmail);
-      setError(null);
-      setSuccessMessage(null);
+      setFieldError(null);
+      setServerError(null);
+      setIsSuccess(false);
       setIsSubmitting(false);
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen, initialEmail]);
 
@@ -43,24 +47,22 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setFieldError(null);
+    setServerError(null);
 
     const clean = email.trim();
     if (!clean || !clean.includes('@')) {
-      setError('Please enter a valid work email address.');
+      setFieldError('Enter a valid email address.');
+      inputRef.current?.focus();
       return;
     }
 
     try {
       setIsSubmitting(true);
-      const res = await authService.requestPasswordReset(clean);
-      if (res.success) {
-        setSuccessMessage(res.message);
-      } else {
-        setError(res.message);
-      }
+      await authService.requestPasswordReset(clean);
+      setIsSuccess(true);
     } catch {
-      setError('Could not request password reset. Please try again.');
+      setServerError('Could not send reset instructions. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -87,18 +89,18 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           <X className="w-4 h-4" />
         </button>
 
-        {successMessage ? (
-          /* Success Screen */
-          <div className="py-4 text-center space-y-4">
+        {isSuccess ? (
+          /* Neutral Success Screen */
+          <div className="py-4 text-center space-y-4" aria-live="polite">
             <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
               <Check className="w-7 h-7 stroke-[2.5]" />
             </div>
             <div>
-              <h3 className="text-lg font-display font-black text-slate-900">
-                Check your inbox
+              <h3 className="text-xl font-display font-black text-slate-900">
+                Check your email
               </h3>
-              <p className="text-xs text-slate-600 mt-2 leading-relaxed max-w-sm mx-auto">
-                {successMessage}
+              <p className="text-sm text-slate-600 mt-2 leading-relaxed max-w-sm mx-auto">
+                If an account exists for this email address, you’ll receive password-reset instructions shortly.
               </p>
             </div>
             <button
@@ -107,7 +109,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 onClose();
                 onBackToSignIn?.();
               }}
-              className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
+              className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
             >
               Return to sign in
             </button>
@@ -120,36 +122,51 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <h3 id="forgot-password-title" className="text-base font-display font-black text-slate-900 leading-tight">
+                <h3 id="forgot-password-title" className="text-lg font-display font-black text-slate-900 leading-tight">
                   Reset your password
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  We&apos;ll send you instructions to set a new password.
+                  Enter the email address associated with your DochGames account. We’ll send you instructions for choosing a new password.
                 </p>
               </div>
             </div>
 
-            {error && (
-              <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2 text-xs font-medium">
+            {serverError && (
+              <div 
+                className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2 text-xs font-medium"
+                aria-live="polite"
+              >
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                <span>{error}</span>
+                <span>{serverError}</span>
               </div>
             )}
 
             <div>
               <label htmlFor="reset-email" className="block text-xs font-bold text-slate-700 mb-1.5">
-                Work email address
+                Email address
               </label>
               <input
+                ref={inputRef}
                 id="reset-email"
                 type="email"
+                name="email"
+                autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldError) setFieldError(null);
+                }}
                 placeholder="name@yourpublication.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-600 transition-all"
-                autoFocus
+                className={`w-full px-3.5 py-2.5 rounded-xl border text-sm text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-600 transition-all ${
+                  fieldError ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200 hover:border-slate-300'
+                }`}
                 required
               />
+              {fieldError && (
+                <p className="mt-1.5 text-xs text-rose-600 font-medium" aria-live="polite">
+                  {fieldError}
+                </p>
+              )}
             </div>
 
             <div className="pt-2 flex items-center justify-between gap-3">
@@ -170,7 +187,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 disabled={isSubmitting}
                 className="px-5 py-2.5 rounded-xl bg-[#D6F938] hover:bg-[#cbf026] text-slate-950 font-black text-xs transition-all shadow-xs active:scale-98 disabled:opacity-50"
               >
-                {isSubmitting ? 'Sending link…' : 'Send reset link'}
+                {isSubmitting ? 'Sending…' : 'Send reset instructions'}
               </button>
             </div>
           </form>

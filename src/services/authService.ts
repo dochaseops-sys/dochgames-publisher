@@ -190,27 +190,24 @@ export const authService = {
     const cleanName = (data.fullName || '').trim();
     const cleanEmail = (data.email || '').trim().toLowerCase();
     const cleanPassword = (data.password || '').trim();
-    const cleanDomain = normalizeDomain(data.websiteDomain || '');
-    const cleanCompany = (data.companyName || '').trim() || (cleanDomain ? `${cleanDomain} Publishing` : 'Digital Media Group');
+    const cleanDomain = data.websiteDomain ? normalizeDomain(data.websiteDomain) : '';
+    const cleanCompany = (data.companyName || '').trim() || (cleanDomain ? `${cleanDomain} Publishing` : `${cleanName} Media`);
 
     if (!cleanName) {
-      return { success: false, message: 'Please enter your full name.' };
+      return { success: false, message: 'Enter your full name.' };
     }
     if (!cleanEmail || !cleanEmail.includes('@')) {
-      return { success: false, message: 'Please enter a valid work email address.' };
+      return { success: false, message: 'Enter a valid email address.' };
     }
     if (!cleanPassword || cleanPassword.length < 8) {
-      return { success: false, message: 'Password must be at least 8 characters long.' };
-    }
-    if (!cleanDomain) {
-      return { success: false, message: 'Please enter your website address or domain.' };
+      return { success: false, message: 'Use at least 8 characters.' };
     }
     if (!data.agreedToTerms) {
-      return { success: false, message: 'You must agree to the Publisher Terms of Service and Privacy Policy to continue.' };
+      return { success: false, message: 'You must accept the Publisher Agreement.' };
     }
 
     // Short simulated network delay
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 450));
 
     const users = getRegisteredUsers();
     if (users.some((u) => u.email.toLowerCase() === cleanEmail)) {
@@ -224,7 +221,7 @@ export const authService = {
       email: cleanEmail,
       role: 'publisher',
       companyOrStudio: cleanCompany,
-      websiteDomain: cleanDomain,
+      websiteDomain: cleanDomain || undefined,
       country: 'United Kingdom',
       createdAt: new Date().toISOString()
     };
@@ -232,15 +229,17 @@ export const authService = {
     users.push({ ...newUser, passwordHash: cleanPassword });
     saveRegisteredUsers(users);
 
-    // Register website domain in websites service
-    const existingWebsites = getWebsites();
-    const alreadyExists = existingWebsites.some((w) => w.domain.toLowerCase() === cleanDomain.toLowerCase());
     let primaryPropId = '';
-    if (!alreadyExists) {
-      const createdProp = addWebsite(cleanCompany, cleanDomain);
-      primaryPropId = createdProp.id;
-    } else {
-      primaryPropId = existingWebsites.find((w) => w.domain.toLowerCase() === cleanDomain.toLowerCase())?.id || '';
+    if (cleanDomain) {
+      // Register website domain in websites service if provided
+      const existingWebsites = getWebsites();
+      const alreadyExists = existingWebsites.some((w) => w.domain.toLowerCase() === cleanDomain.toLowerCase());
+      if (!alreadyExists) {
+        const createdProp = addWebsite(cleanCompany, cleanDomain);
+        primaryPropId = createdProp.id;
+      } else {
+        primaryPropId = existingWebsites.find((w) => w.domain.toLowerCase() === cleanDomain.toLowerCase())?.id || '';
+      }
     }
 
     // Sync to publisherProfileService
@@ -253,8 +252,8 @@ export const authService = {
 
     await publisherProfileService.updateBusiness({
       name: cleanCompany,
-      primaryWebsiteDomain: cleanDomain,
-      primaryWebsiteId: primaryPropId,
+      primaryWebsiteDomain: cleanDomain || undefined,
+      primaryWebsiteId: primaryPropId || undefined,
       contactEmail: cleanEmail
     });
 
@@ -344,12 +343,12 @@ export const authService = {
   async requestPasswordReset(email: string): Promise<{ success: boolean; message: string }> {
     const clean = (email || '').trim().toLowerCase();
     if (!clean || !clean.includes('@')) {
-      return { success: false, message: 'Please enter a valid email address.' };
+      return { success: false, message: 'Enter a valid email address.' };
     }
     await new Promise((r) => setTimeout(r, 400));
     return {
       success: true,
-      message: `We've sent a password reset link to ${clean}. Please check your inbox and spam folder.`
+      message: "If an account exists for this email address, you’ll receive password-reset instructions shortly."
     };
   }
 };
