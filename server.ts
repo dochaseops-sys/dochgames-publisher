@@ -1,5 +1,6 @@
 import express from 'express';
 import http from 'http';
+import net from 'net';
 import { WebSocketServer, WebSocket } from 'ws';
 import path from 'path';
 import crypto from 'crypto';
@@ -201,6 +202,9 @@ let activities: ActivityLog[] = [
 
 // Setup WebSocket Server
 const wss = new WebSocketServer({ server });
+wss.on('error', (err) => {
+  console.warn('[DochGames WS Server Error]:', err.message);
+});
 
 interface ClientInfo {
   id: string;
@@ -464,8 +468,24 @@ async function startServer() {
     });
   }
 
-  server.listen(PORT, () => {
-    console.log(`DochGames Platform Server running on port ${PORT}`);
+  function getAvailablePort(startPort: number): Promise<number> {
+    return new Promise((resolve) => {
+      const testServer = net.createServer();
+      testServer.once('error', () => {
+        resolve(getAvailablePort(startPort + 1));
+      });
+      testServer.once('listening', () => {
+        testServer.close(() => {
+          resolve(startPort);
+        });
+      });
+      testServer.listen(startPort);
+    });
+  }
+
+  const actualPort = await getAvailablePort(Number(PORT));
+  server.listen(actualPort, () => {
+    console.log(`DochGames Platform Server running on http://localhost:${actualPort}`);
   });
 }
 
