@@ -99,8 +99,21 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
               Follow these simple steps to start streaming games on your property.
             </p>
           </div>
-          <div className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-            {[hasWebsite, hasWidget, hasLiveWidget].filter(Boolean).length} of 3 complete
+          <div className="flex items-center gap-2">
+            {onOpenOnboarding && (
+              <button
+                type="button"
+                onClick={onOpenOnboarding}
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
+                title="Open 3-step setup walkthrough"
+              >
+                <Sparkles className="w-3 h-3 text-blue-600" />
+                <span>Guided wizard</span>
+              </button>
+            )}
+            <div className="text-xs font-semibold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
+              {[hasWebsite, hasWidget, hasLiveWidget].filter(Boolean).length} of 3 complete
+            </div>
           </div>
         </div>
 
