@@ -118,7 +118,7 @@ export const WidgetsPage: React.FC<WidgetsPageProps> = ({
         <button
           type="button"
           onClick={onCreateWidget}
-          className="px-5 py-2.5 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 active:scale-98"
+          className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 active:scale-98"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           <span>Create new widget</span>
@@ -126,7 +126,7 @@ export const WidgetsPage: React.FC<WidgetsPageProps> = ({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-center gap-3">
+      <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-stretch md:items-center gap-2.5 sm:gap-3">
         {/* Search */}
         <div className="relative w-full md:flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -139,33 +139,34 @@ export const WidgetsPage: React.FC<WidgetsPageProps> = ({
           />
         </div>
 
-        {/* Website Filter */}
-        <div className="w-full md:w-56">
-          <select
-            value={selectedPropertyId}
-            onChange={(e) => setSelectedPropertyId(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-slate-800 bg-white"
-          >
-            <option value="all">All Websites</option>
-            {properties.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-        </div>
+        {/* Website & Status Filters - Side by side on mobile for space efficiency */}
+        <div className="grid grid-cols-2 md:flex items-center gap-2 w-full md:w-auto">
+          <div className="w-full md:w-52">
+            <select
+              value={selectedPropertyId}
+              onChange={(e) => setSelectedPropertyId(e.target.value)}
+              className="w-full px-2.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-slate-800 bg-white"
+            >
+              <option value="all">All Websites</option>
+              {properties.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
 
-        {/* Status Filter */}
-        <div className="w-full md:w-44">
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-slate-800 bg-white"
-          >
-            <option value="all">All Statuses</option>
-            <option value="live">Live</option>
-            <option value="ready_to_install">Ready to install</option>
-            <option value="draft">Draft</option>
-            <option value="paused">Paused</option>
-          </select>
+          <div className="w-full md:w-40">
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-2.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-slate-800 bg-white"
+            >
+              <option value="all">All Statuses</option>
+              <option value="live">Live</option>
+              <option value="ready_to_install">Ready to install</option>
+              <option value="draft">Draft</option>
+              <option value="paused">Paused</option>
+            </select>
+          </div>
         </div>
       </div>
 

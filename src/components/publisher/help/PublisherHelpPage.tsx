@@ -5,7 +5,11 @@ import {
 } from 'lucide-react';
 import { PLATFORM_INSTRUCTIONS } from '../../../config/platformInstructions';
 
-export const PublisherHelpPage: React.FC = () => {
+interface PublisherHelpPageProps {
+  onOpenOnboarding?: () => void;
+}
+
+export const PublisherHelpPage: React.FC<PublisherHelpPageProps> = ({ onOpenOnboarding }) => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [selectedGuidePlatform, setSelectedGuidePlatform] = useState<string>('wordpress');
 
@@ -35,13 +39,25 @@ export const PublisherHelpPage: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-display font-black text-slate-900 tracking-tight">
-          Help & Installation Guides
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-600 mt-1">
-          Everything you need to install, configure, and troubleshoot your game widgets.
-        </p>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-display font-black text-slate-900 tracking-tight">
+            Help & Installation Guides
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            Everything you need to install, configure, and troubleshoot your game widgets.
+          </p>
+        </div>
+
+        {onOpenOnboarding && (
+          <button
+            type="button"
+            onClick={onOpenOnboarding}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-xs transition-all shadow-xs flex items-center justify-center gap-1.5"
+          >
+            <span>Launch Setup Wizard</span>
+          </button>
+        )}
       </div>
 
       {/* Quick Cards */}

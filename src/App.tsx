@@ -13,6 +13,7 @@ import { SignOutConfirmationModal } from './components/common/SignOutConfirmatio
 import { NotificationCenter } from './components/notifications/NotificationCenter';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { AuthLayout } from './components/auth/AuthLayout';
+import { PublisherOnboardingModal } from './components/onboarding/PublisherOnboardingModal';
 
 import { 
   UserProfile, PublisherProperty, WidgetConfig, 
@@ -57,6 +58,7 @@ export function App() {
   // Modals
   const [isConnectModalOpen, setIsConnectModalOpen] = useState<boolean>(false);
   const [selectedPlayableGame, setSelectedPlayableGame] = useState<GameItem | null>(null);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
 
   // Load properties and widgets from persistent services
   const refreshData = () => {
@@ -151,12 +153,17 @@ export function App() {
     setCurrentView('signin');
   };
 
-  const handleAuthSuccess = (user: AuthUser) => {
+  const handleAuthSuccess = (user: AuthUser, isNewUser?: boolean) => {
     setIsSignedOut(false);
     setCurrentView('home');
     refreshData();
     publisherProfileService.getProfile().then(p => setPublisherProfile(p));
     publisherProfileService.getBusiness().then(b => setPublisherBusiness(b));
+
+    const alreadyCompleted = localStorage.getItem(`dochgames_onboarding_completed_${user.id}`);
+    if (isNewUser || !alreadyCompleted) {
+      setIsOnboardingOpen(true);
+    }
   };
 
   // Render Authentication Layout when signed out or when viewing Sign In / Sign Up
@@ -187,8 +194,8 @@ export function App() {
         onSignOut={() => setIsSignOutModalOpen(true)}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full">
+      {/* Main Content Area - pb-20 on mobile ensures bottom nav never obscures content */}
+      <main className="flex-1 w-full pb-20 md:pb-0">
         <ErrorBoundary onReset={() => { refreshData(); setCurrentView('home'); }}>
           {/* TAB 1: HOME */}
           {currentView === 'home' && (
@@ -199,6 +206,7 @@ export function App() {
               onSelectWidget={(wId, step) => handleSelectWidget(wId, step)}
               onNavigateTab={(tab) => handleNavigate(tab)}
               onConnectWebsite={() => setIsConnectModalOpen(true)}
+              onOpenOnboarding={() => setIsOnboardingOpen(true)}
             />
           )}
 
@@ -253,7 +261,7 @@ export function App() {
 
           {/* TAB 5: HELP */}
           {currentView === 'help' && (
-            <PublisherHelpPage />
+            <PublisherHelpPage onOpenOnboarding={() => setIsOnboardingOpen(true)} />
           )}
 
           {/* PROFILE & SETTINGS (Accessible via Avatar dropdown) */}
@@ -331,6 +339,39 @@ export function App() {
         isOpen={isSignOutModalOpen}
         onClose={() => setIsSignOutModalOpen(false)}
         onConfirmSignOut={handleConfirmSignOut}
+      />
+
+      {/* Publisher Guided Onboarding Modal (After sign-up & on demand) */}
+      <PublisherOnboardingModal
+        isOpen={isOnboardingOpen}
+        userEmail={publisherProfile?.email || currentUser.email}
+        initialDomain={publisherBusiness?.primaryWebsiteDomain || properties[0]?.domain}
+        initialCompanyName={publisherBusiness?.name || currentUser.companyOrStudio}
+        onClose={() => {
+          const session = authService.getSession();
+          if (session.user) {
+            localStorage.setItem(`dochgames_onboarding_completed_${session.user.id}`, 'true');
+          }
+          setIsOnboardingOpen(false);
+        }}
+        onFinishToDashboard={() => {
+          const session = authService.getSession();
+          if (session.user) {
+            localStorage.setItem(`dochgames_onboarding_completed_${session.user.id}`, 'true');
+          }
+          refreshData();
+          setIsOnboardingOpen(false);
+          setCurrentView('home');
+        }}
+        onCustomiseWidget={(widgetId) => {
+          const session = authService.getSession();
+          if (session.user) {
+            localStorage.setItem(`dochgames_onboarding_completed_${session.user.id}`, 'true');
+          }
+          refreshData();
+          setIsOnboardingOpen(false);
+          handleSelectWidget(widgetId, 2);
+        }}
       />
     </div>
   );

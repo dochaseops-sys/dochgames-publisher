@@ -12,6 +12,7 @@ interface PublisherHomePageProps {
   onSelectWidget: (widgetId: string, step?: 1 | 2 | 3) => void;
   onNavigateTab: (tab: 'widgets' | 'analytics' | 'websites' | 'help') => void;
   onConnectWebsite: () => void;
+  onOpenOnboarding?: () => void;
 }
 
 export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
@@ -20,7 +21,8 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
   onCreateWidget,
   onSelectWidget,
   onNavigateTab,
-  onConnectWebsite
+  onConnectWebsite,
+  onOpenOnboarding
 }) => {
   // Aggregate stats
   const totalImpressions = widgets.reduce((acc, w) => acc + (w.stats?.impressions || 0), 0);
@@ -41,18 +43,18 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold mb-3 border border-blue-400/30">
             <Sparkles className="w-3.5 h-3.5 text-[#D6F938]" /> DochGames Publisher Platform
           </div>
-          <h1 className="text-2xl sm:text-4xl font-display font-black tracking-tight leading-tight">
+          <h1 className="text-xl sm:text-3xl lg:text-4xl font-display font-black tracking-tight leading-tight">
             Engage your audience with instant web games
           </h1>
-          <p className="mt-2 text-sm sm:text-base text-slate-300 leading-relaxed">
+          <p className="mt-2 text-xs sm:text-base text-slate-300 leading-relaxed">
             Add responsive, ad-monetised web games to your site in minutes without writing code. Keep visitors on your pages up to 3x longer.
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
             <button
               type="button"
               onClick={onCreateWidget}
-              className="px-5 py-3 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 active:scale-98"
+              className="w-full sm:w-auto justify-center px-5 py-3 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 active:scale-98"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Create new widget</span>
@@ -61,11 +63,22 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
             <button
               type="button"
               onClick={() => onNavigateTab('websites')}
-              className="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm transition-all flex items-center gap-2 backdrop-blur-xs"
+              className="w-full sm:w-auto justify-center px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-xs"
             >
               <span>Manage websites</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+
+            {onOpenOnboarding && (
+              <button
+                type="button"
+                onClick={onOpenOnboarding}
+                className="w-full sm:w-auto justify-center px-4 py-3 rounded-2xl bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-400/30 font-bold text-xs sm:text-sm transition-all flex items-center gap-2"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#D6F938]" />
+                <span>Launch Quick Wizard</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -309,18 +322,18 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 self-end sm:self-center">
+                  <div className="flex items-center gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
                     <button
                       type="button"
                       onClick={() => onSelectWidget(w.id, 2)}
-                      className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-white text-slate-700 font-semibold text-xs transition-colors"
+                      className="flex-1 sm:flex-initial text-center px-3.5 py-2 sm:py-1.5 rounded-xl border border-slate-200 hover:bg-white text-slate-700 font-semibold text-xs transition-colors"
                     >
                       Customise
                     </button>
                     <button
                       type="button"
                       onClick={() => onSelectWidget(w.id, 3)}
-                      className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors"
+                      className="flex-1 sm:flex-initial text-center px-3.5 py-2 sm:py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs"
                     >
                       Install code
                     </button>

@@ -7,7 +7,7 @@ import { AuthUser } from '../../types/auth';
 
 interface AuthLayoutProps {
   initialMode?: 'signin' | 'signup';
-  onAuthSuccess: (user: AuthUser) => void;
+  onAuthSuccess: (user: AuthUser, isNewUser?: boolean) => void;
   onBackToApp?: () => void;
 }
 
@@ -67,12 +67,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
           <div className="lg:col-span-7 p-6 sm:p-10 lg:p-12 flex flex-col justify-center bg-white">
             {mode === 'signin' ? (
               <SignInPage
-                onSuccess={onAuthSuccess}
+                onSuccess={(user) => onAuthSuccess(user, false)}
                 onNavigateToSignUp={() => setMode('signup')}
               />
             ) : (
               <SignUpPage
-                onSuccess={onAuthSuccess}
+                onSuccess={(user) => onAuthSuccess(user, true)}
                 onNavigateToSignIn={() => setMode('signin')}
               />
             )}

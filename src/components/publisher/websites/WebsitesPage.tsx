@@ -75,7 +75,7 @@ export const WebsitesPage: React.FC<WebsitesPageProps> = ({
         <button
           type="button"
           onClick={() => setShowAddModal(true)}
-          className="px-5 py-2.5 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 active:scale-98"
+          className="w-full sm:w-auto justify-center px-5 py-2.5 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 active:scale-98"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           <span>Connect website</span>
@@ -197,8 +197,8 @@ export const WebsitesPage: React.FC<WebsitesPageProps> = ({
 
       {/* Add Website Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-3xl p-5 sm:p-8 max-w-md w-full shadow-2xl border border-slate-200 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Globe className="w-5 h-5 text-blue-600" />

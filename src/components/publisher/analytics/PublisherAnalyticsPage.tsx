@@ -38,7 +38,7 @@ export const PublisherAnalyticsPage: React.FC<PublisherAnalyticsPageProps> = ({
         </div>
 
         {/* Time Filter */}
-        <div className="flex items-center bg-white border border-slate-200 rounded-2xl p-1 shadow-xs">
+        <div className="flex items-center bg-white border border-slate-200 rounded-2xl p-1 shadow-xs w-full sm:w-auto justify-between sm:justify-start">
           {[
             { id: '7d', label: 'Last 7 days' },
             { id: '30d', label: 'Last 30 days' },
@@ -48,7 +48,7 @@ export const PublisherAnalyticsPage: React.FC<PublisherAnalyticsPageProps> = ({
               key={t.id}
               type="button"
               onClick={() => setTimeRange(t.id as any)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
                 timeRange === t.id
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -134,8 +134,9 @@ export const PublisherAnalyticsPage: React.FC<PublisherAnalyticsPageProps> = ({
             No widgets available to display statistics.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div>
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <table className="w-full min-w-[580px] text-left text-xs">
               <thead>
                 <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase tracking-wider">
                   <th className="py-3 px-3">Widget Name</th>
@@ -184,6 +185,10 @@ export const PublisherAnalyticsPage: React.FC<PublisherAnalyticsPageProps> = ({
               </tbody>
             </table>
           </div>
+          <p className="text-[11px] text-slate-400 sm:hidden mt-2 text-center">
+            ← Swipe horizontally to see complete statistics →
+          </p>
+        </div>
         )}
       </div>
 

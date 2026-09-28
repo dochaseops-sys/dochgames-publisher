@@ -21,7 +21,7 @@ export const ProfileSummary: React.FC<ProfileSummaryProps> = ({
     : 'P';
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+    <div className="bg-white rounded-3xl p-4 sm:p-7 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-5">
       <div className="flex items-center gap-4">
         {/* Avatar or Initials Circle */}
         <div className="relative">
