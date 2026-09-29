@@ -2,7 +2,8 @@ import React from 'react';
 import { WidgetConfig, PublisherProperty, GameItem } from '../../../types';
 import { 
   Sparkles, Plus, ArrowRight, Play, Eye, Clock, 
-  DollarSign, CheckCircle2, Circle, AlertCircle, ExternalLink, HelpCircle 
+  DollarSign, CheckCircle2, Circle, AlertCircle, ExternalLink, HelpCircle,
+  Edit3, Code, Layers
 } from 'lucide-react';
 
 interface PublisherHomePageProps {
@@ -254,9 +255,9 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
       </div>
 
       {/* Recent Widgets Table / List */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div>
+      <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-sm space-y-3 sm:space-y-4">
+        <div className="flex items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="min-w-0 flex-1">
             <h2 className="text-base sm:text-lg font-bold font-display text-slate-900">
               Your Widgets
             </h2>
@@ -268,7 +269,7 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
           <button
             type="button"
             onClick={() => onNavigateTab('widgets')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="whitespace-nowrap shrink-0 text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 mt-0.5 sm:mt-0"
           >
             <span>View all</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -296,59 +297,76 @@ export const PublisherHomePage: React.FC<PublisherHomePageProps> = ({
               return (
                 <div
                   key={w.id}
-                  className="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-slate-50/60 rounded-xl px-2 transition-colors"
+                  className="py-3.5 px-2 rounded-2xl hover:bg-slate-50/70 transition-colors"
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900 truncate">
+                  {/* Top row: Format icon, Name (truncated), Status badge (shrink-0) */}
+                  <div className="flex items-center justify-between gap-2.5 w-full">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <Layers className="w-3.5 h-3.5" />
+                      </div>
+                      <h3 className="text-sm font-bold text-slate-900 truncate" title={w.name}>
                         {w.name}
                       </h3>
-                      {/* Lifecycle Status Badge */}
+                    </div>
+
+                    {/* Status Badge: shrink-0 & whitespace-nowrap prevents it from overflowing */}
+                    <div className="shrink-0 whitespace-nowrap pl-1">
                       {isLive && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                           Live
                         </span>
                       )}
                       {isDraft && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-600">
+                        <span className="inline-flex items-center px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 text-slate-600">
                           Draft
                         </span>
                       )}
                       {isReady && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700">
+                        <span className="inline-flex items-center px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700">
                           Ready to install
                         </span>
                       )}
                       {w.lifecycleStatus === 'installation_error' && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800">
                           Needs check
                         </span>
                       )}
                       {w.lifecycleStatus === 'paused' && (
-                        <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-200 text-slate-600">
+                        <span className="inline-flex items-center px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-slate-200 text-slate-600">
                           Paused
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {w.propertyName} · {w.gameCount} games · {w.stats?.gameStarts.toLocaleString() || 0} plays
-                    </p>
                   </div>
 
-                  <div className="flex items-center gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 justify-end">
+                  {/* Subtitle row */}
+                  <p className="text-xs text-slate-500 mt-1 pl-9 truncate">
+                    <span className="font-medium text-slate-700">{w.propertyName}</span>
+                    <span className="mx-1.5 text-slate-300">·</span>
+                    <span>{w.gameCount} games</span>
+                    <span className="mx-1.5 text-slate-300">·</span>
+                    <span>{(w.stats?.gameStarts || 0).toLocaleString()} plays</span>
+                  </p>
+
+                  {/* Actions row: refined touch buttons */}
+                  <div className="flex items-center gap-2 mt-2.5 pl-0 sm:pl-9">
                     <button
                       type="button"
                       onClick={() => onSelectWidget(w.id, 2)}
-                      className="flex-1 sm:flex-initial text-center px-3.5 py-2 sm:py-1.5 rounded-xl border border-slate-200 hover:bg-white text-slate-700 font-semibold text-xs transition-colors"
+                      className="flex-1 sm:flex-initial text-center px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
                     >
-                      Customise
+                      <Edit3 className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Customise</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => onSelectWidget(w.id, 3)}
-                      className="flex-1 sm:flex-initial text-center px-3.5 py-2 sm:py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs"
+                      className="flex-1 sm:flex-initial text-center px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors shadow-xs flex items-center justify-center gap-1.5"
                     >
-                      Install code
+                      <Code className="w-3.5 h-3.5" />
+                      <span>Install code</span>
                     </button>
                   </div>
                 </div>

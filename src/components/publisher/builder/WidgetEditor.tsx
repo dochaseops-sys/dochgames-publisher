@@ -111,21 +111,10 @@ export const WidgetEditor: React.FC<WidgetEditorProps> = ({
           </div>
         </div>
 
-        {/* Right side: Auto-save status and Next button */}
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          <div className="flex items-center gap-1.5 text-xs text-slate-600">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Draft auto-saved</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={onContinue}
-            className="px-5 py-2.5 rounded-xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-xs sm:text-sm shadow-sm hover:shadow transition-all flex items-center gap-2 active:scale-98"
-          >
-            <span>Continue to Install</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+        {/* Right side: Auto-save status */}
+        <div className="flex items-center gap-2 text-xs text-slate-500 self-end sm:self-center">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Draft auto-saved</span>
         </div>
       </div>
 
@@ -577,6 +566,27 @@ export const WidgetEditor: React.FC<WidgetEditorProps> = ({
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Bottom Action Footer */}
+      <div className="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <button
+          type="button"
+          onClick={onBack}
+          className="w-full sm:w-auto px-5 py-3 rounded-2xl border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm transition-colors flex items-center justify-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Change template</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onContinue}
+          className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#D6F938] hover:bg-[#cbf028] text-slate-950 font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-98"
+        >
+          <span>Continue to Install</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
